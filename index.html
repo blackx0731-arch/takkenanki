@@ -1050,7 +1050,7 @@ function progHTML(items){
 
 /* ---------- 画面の状態 ---------- */
 let filter = "all";      // all | weak | none
-let openId = null;
+let openIds = new Set();
 let stampedId = null;
 let shuf = null;
 
@@ -1126,10 +1126,10 @@ function renderTheme(g, t){
       `<button data-act="filter" data-k="${k}" aria-pressed="${filter===k}">${l}</button>`).join("")}
   </div>
   ${list.length ? `<ul class="items">
-    ${list.map(it => `<li class="item ${openId===it.id?"open":""}">
-      <button class="q" data-act="toggle" data-id="${it.id}" aria-expanded="${openId===it.id}">
+    ${list.map(it => `<li class="item ${openIds.has(it.id)?"open":""}">
+      <button class="q" data-act="toggle" data-id="${it.id}" aria-expanded="${openIds.has(it.id)}">
         ${stampHTML(it.id)}<span class="qt">${esc(it.q)}</span><span class="chev" aria-hidden="true"></span>
-      </button>${openId===it.id ? detailHTML(it) : ""}</li>`).join("")}
+      </button>${openIds.has(it.id) ? detailHTML(it) : ""}</li>`).join("")}
   </ul>` : `<p class="empty">${emptyMsg}</p>`}`;
   stampedId = null;
 }
@@ -1179,7 +1179,6 @@ function nav(to){
 }
 function route(){
   const h = path.split("/").filter(Boolean);
-  openId = null;
   if (h[0] === "g"){
     const g = DATA.find(x => x.id === h[1]);
     if (g && h[2] === "t"){
@@ -1204,11 +1203,12 @@ app.addEventListener("click", e => {
   const act = b.dataset.act;
   if (act === "nav"){ nav(b.dataset.to); }
   else if (act === "toggle"){
-    openId = openId === b.dataset.id ? null : b.dataset.id;
+    const id = b.dataset.id;
+    if (openIds.has(id)) openIds.delete(id); else openIds.add(id);
     const { g, t } = current(); renderTheme(g, t);
   }
   else if (act === "filter"){
-    filter = b.dataset.k; openId = null;
+    filter = b.dataset.k;
     const { g, t } = current(); renderTheme(g, t);
   }
   else if (act === "rate"){
@@ -1217,7 +1217,7 @@ app.addEventListener("click", e => {
     if (shuf && path.startsWith("shuffle")){
       shuf.i++; shuf.shown = false; renderShuffle();
     } else {
-      openId = null; stampedId = id;
+      stampedId = id;
       const { g, t } = current(); renderTheme(g, t);
     }
   }
