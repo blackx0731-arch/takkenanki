@@ -74,6 +74,9 @@ a{color:inherit}
 /* 詳細 */
 .detail{padding:0 16px 16px; border-top:1px dashed var(--line)}
 .a{padding-top:14px; line-height:1.85}
+.tbl{width:100%; border-collapse:collapse; margin:10px 0; font-size:14px}
+.tbl th,.tbl td{border:1px solid var(--line); padding:6px 8px; text-align:left}
+.tbl th{background:color-mix(in srgb, var(--g) 10%, transparent); font-weight:700}
 .a strong{background:linear-gradient(transparent 60%, color-mix(in srgb, var(--g) 22%, transparent) 60%); font-weight:700}
 .trap{margin-top:12px; padding:8px 12px; border-left:3px solid var(--shu); font-size:15px; background:color-mix(in srgb, var(--shu) 7%, transparent)}
 .trap b{display:block; color:var(--shu); font-size:13px}
@@ -145,6 +148,8 @@ const DATA = [
       { id:"g02-06", q:"４ 宅建業者名簿の登載事項",
         a:"① 商号・名称\n② 法人の場合、役員の氏名、政令で定める使用人の氏名\n③ 個人の場合、氏名、政令で定める使用人の氏名\n④ 事務所の名称、所在地\n⑤ 指示処分・業務停止処分の年月日・内容\n⑥ 兼業は事業の種類\n⑦ 取引一任代理の認可を受けているときは、その旨および認可の年月日\n⑧ 免許証番号・免許年月日",
         trap:"名簿は一般の閲覧に供される。\n①〜④、その他に変更があった時には、**30日以内**に免許権者へ届出。\n廃業、免許の取消処分を受けた場合は返納（期間満了の場合は返納不要）。" },
+      { id:"g02-06b", q:"免許申請書の添付書類（閲覧・変更届の要否）",
+        a:"|書類|閲覧|変更届\n|宅建業経歴書|◯|×\n|欠格事由に該当しない誓約書|◯|◯\n|役員等の略歴書|×|◯\n|専任宅建士の氏名|◯|◯\n|専任の宅建士を備えていることの証明|×|◯\n|財務諸表|◯|×" },
       { id:"g02-07", q:"５ 免許換え",
         a:"① 大臣 → 知事\n　例：東京と大阪に事務所 → 大阪を廃止（東京都の知事へ申請）\n② 知事 → 大臣\n　例：東京のほかに大阪に新設（国（地方整備局）へ申請）\n③ 知事 → 他県の知事\n　例：唯一の事務所を東京から大阪に移転（大阪の知事へ申請）",
         trap:"免許換えのときは廃業届不要。\n有効期間は新たな免許を取得してから5年。\n免許換えを怠ると免許取消し。\n申請中でも、免許換えがなされるまでは今の免許は有効。" },
@@ -1033,7 +1038,30 @@ const save = () => { try { localStorage.setItem(KEY, JSON.stringify(marks)); } c
 
 const app = document.getElementById("app");
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const fmt = s => esc(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\n/g, "<br>");
+const inline = s => esc(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+function fmt(s){
+  // 行頭が「|」の連続はテーブルとして描画する（1行目=見出し行）
+  const lines = String(s).split("\n");
+  let out = "", i = 0, buf = [];
+  const flush = () => { if (buf.length){ out += inline(buf.join("\n")).replace(/\n/g, "<br>"); buf = []; } };
+  while (i < lines.length){
+    if (lines[i].trim().startsWith("|")){
+      const rows = [];
+      while (i < lines.length && lines[i].trim().startsWith("|")){
+        rows.push(lines[i].trim().replace(/^\||\|$/g, "").split("|").map(c => c.trim()));
+        i++;
+      }
+      flush();
+      const [head, ...body] = rows;
+      out += `<table class="tbl"><thead><tr>${head.map(c => `<th>${inline(c)}</th>`).join("")}</tr></thead>
+        <tbody>${body.map(r => `<tr>${r.map(c => `<td>${inline(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+    } else {
+      buf.push(lines[i]); i++;
+    }
+  }
+  flush();
+  return out;
+}
 
 const allItems = g => g.themes.flatMap(t => t.items);
 function stats(items){
