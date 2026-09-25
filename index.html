@@ -6,7 +6,7 @@
 <title>宅建 暗記目次</title>
 <style>
 :root{
-  --paper:#EEF1F0; --sheet:#FFFFFF; --ink:#1C2A3A; --sub:#5B6875; --line:#D5DBDD; --shu:#C8372D;
+  --paper:#EEF1F0; --sheet:#FFFFFF; --ink:#1C2A3A; --sub:#5B6875; --line:#D5DBDD; --shu:#C8372D; --ok:#2E7D4F; --warn:#B07612;
   --sans:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic",Meiryo,system-ui,sans-serif;
   --serif:"Hiragino Mincho ProN","Yu Mincho",YuMincho,"Noto Serif JP",serif;
   --g:#1C2A3A;
@@ -14,7 +14,7 @@
   padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
 @media (prefers-color-scheme:dark){
-  :root{--paper:#141A20; --sheet:#1D252D; --ink:#E6EAEE; --sub:#98A4AF; --line:#2E3943; --shu:#E0564B;}
+  :root{--paper:#141A20; --sheet:#1D252D; --ink:#E6EAEE; --sub:#98A4AF; --line:#2E3943; --shu:#E0564B; --ok:#4CAF7D; --warn:#E0A542;}
 }
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
@@ -41,7 +41,10 @@ a{color:inherit}
 
 /* 進捗 */
 .prog{display:flex; gap:12px; font-size:13px; color:var(--sub); flex-wrap:wrap}
-.prog b{font-family:var(--serif); color:var(--shu); font-weight:700; margin-right:2px}
+.prog b{font-family:var(--serif); font-weight:700; margin-right:2px}
+.prog .po b{color:var(--ok)}
+.prog .ps b{color:var(--warn)}
+.prog .px b{color:var(--shu)}
 .bar{height:4px; background:var(--line); border-radius:2px; overflow:hidden; margin-top:8px}
 .bar i{display:block; height:100%; background:var(--gc,var(--g))}
 
@@ -66,10 +69,13 @@ a{color:inherit}
 .item.open .chev{transform:rotate(-135deg); margin-top:4px}
 
 /* 判子 */
-.stamp{width:30px; height:30px; flex:none; border-radius:50%; border:1.5px dashed var(--line); display:flex; align-items:center; justify-content:center; font-family:var(--serif); font-weight:700; font-size:17px; color:var(--shu)}
-.stamp.on{border:2px solid var(--shu); transform:rotate(-8deg)}
+.stamp{width:30px; height:30px; flex:none; border-radius:50%; border:1.5px dashed var(--line); display:flex; align-items:center; justify-content:center; font-family:var(--serif); font-weight:700; font-size:17px; color:var(--sub)}
+.stamp.on{border-style:solid; border-width:2px}
+.stamp.on.m-o{border-color:var(--ok); color:var(--ok); background:color-mix(in srgb, var(--ok) 18%, transparent)}
+.stamp.on.m-s{border-color:var(--warn); color:var(--warn); background:color-mix(in srgb, var(--warn) 18%, transparent)}
+.stamp.on.m-x{border-color:var(--shu); color:var(--shu); background:color-mix(in srgb, var(--shu) 18%, transparent)}
 .stamp.pop{animation:pop .28s ease-out}
-@keyframes pop{0%{transform:scale(1.6) rotate(-8deg); opacity:0} 100%{transform:scale(1) rotate(-8deg); opacity:1}}
+@keyframes pop{0%{transform:scale(1.6); opacity:0} 100%{transform:scale(1); opacity:1}}
 
 /* 詳細 */
 .detail{padding:0 16px 16px; border-top:1px dashed var(--line)}
@@ -82,8 +88,13 @@ a{color:inherit}
 .trap b{display:block; color:var(--shu); font-size:13px}
 .rate{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:16px}
 .rate button{border:1px solid var(--line); border-radius:6px; padding:8px 4px; font-size:13px; color:var(--sub); display:flex; flex-direction:column; align-items:center; line-height:1.3}
-.rate button span{font-family:var(--serif); font-size:24px; font-weight:700; color:var(--shu)}
-.rate button.sel{border-color:var(--shu); color:var(--shu); font-weight:700}
+.rate button span{font-family:var(--serif); font-size:24px; font-weight:700}
+.rate button.m-o span{color:var(--ok)}
+.rate button.m-s span{color:var(--warn)}
+.rate button.m-x span{color:var(--shu)}
+.rate button.m-o.sel{border-color:var(--ok); color:var(--ok); background:color-mix(in srgb, var(--ok) 14%, transparent); font-weight:700}
+.rate button.m-s.sel{border-color:var(--warn); color:var(--warn); background:color-mix(in srgb, var(--warn) 14%, transparent); font-weight:700}
+.rate button.m-x.sel{border-color:var(--shu); color:var(--shu); background:color-mix(in srgb, var(--shu) 14%, transparent); font-weight:700}
 
 /* ランダム */
 .shuf{margin-top:28px; padding-top:20px; border-top:1px solid var(--line)}
@@ -149,12 +160,12 @@ const DATA = [
         a:"① 商号・名称\n② 法人の場合、役員の氏名、政令で定める使用人の氏名\n③ 個人の場合、氏名、政令で定める使用人の氏名\n④ 事務所の名称、所在地\n⑤ 指示処分・業務停止処分の年月日・内容\n⑥ 兼業は事業の種類\n⑦ 取引一任代理の認可を受けているときは、その旨および認可の年月日\n⑧ 免許証番号・免許年月日",
         trap:"名簿は一般の閲覧に供される。\n①〜④、その他に変更があった時には、**30日以内**に免許権者へ届出。\n廃業、免許の取消処分を受けた場合は返納（期間満了の場合は返納不要）。" },
       { id:"g02-06b", q:"免許申請書の添付書類（閲覧・変更届の要否）",
-        a:"|書類|閲覧|変更届\n|宅建業経歴書|◯|×\n|欠格事由に該当しない誓約書|◯|◯\n|役員等の略歴書|×|◯\n|専任宅建士の氏名|◯|◯\n|専任の宅建士を備えていることの証明|×|◯\n|財務諸表|◯|×" },
+        a:"|書類|閲覧|変更届\n|宅建業経歴書|◯|×\n|欠格事由に該当しない誓約書|×|◯\n|役員等の略歴書|◯|◯\n|専任宅建士の氏名|×|◯\n|専任の宅建士を備えていることの証明|◯|◯\n|財務諸表|◯|×" },
       { id:"g02-07", q:"５ 免許換え",
         a:"① 大臣 → 知事\n　例：東京と大阪に事務所 → 大阪を廃止（東京都の知事へ申請）\n② 知事 → 大臣\n　例：東京のほかに大阪に新設（国（地方整備局）へ申請）\n③ 知事 → 他県の知事\n　例：唯一の事務所を東京から大阪に移転（大阪の知事へ申請）",
         trap:"免許換えのときは廃業届不要。\n有効期間は新たな免許を取得してから5年。\n免許換えを怠ると免許取消し。\n申請中でも、免許換えがなされるまでは今の免許は有効。" },
       { id:"g02-08", q:"６ 廃業等の届け",
-        a:"① 死亡：**知った日から**30日以内／相続人／**死亡の時**\n② 破産開始：その日から30日以内／破産管財人／届出の時\n③ 廃業：その日から30日以内／本人・代表／届出の時\n④ 法人の解散：その日から30日以内／清算人／届出の時\n⑤ 法人の合併：その日から30日以内／**消滅会社の代表役員**／**合併の時**" },
+        a:"|事由|期限|届出義務者|失効時期\n|① 死亡|知った日から30日以内|相続人|死亡の時\n|② 破産開始|その日から30日以内|破産管財人|届出の時\n|③ 廃業|その日から30日以内|本人・代表|届出の時\n|④ 法人の解散|その日から30日以内|清算人|届出の時\n|⑤ 法人の合併|その日から30日以内|消滅会社の代表役員|合併の時" },
       { id:"g02-09", q:"７ みなし業者",
         a:"免許は「その人に対してのみ」与えられているので**相続**や**合併**で承継されない。\nただし、以下は従前の取引を結了する目的の範囲内で、なお宅建業者とみなされる。\n宅建業者が死亡 → 相続人\n宅建業者が合併で消滅 → 合併後の法人\n免許取消し、廃業 → 宅建業者であった者" },
       { id:"g02-10", q:"８ 免許不要で宅建業ができる団体等",
@@ -188,7 +199,7 @@ const DATA = [
         a:"宅建士証の有効期間：**5年**\n交付申請先：登録をしている都道府県知事\n法定講習：登録をしている知事が指定する講習で、交付申請前**6ヶ月以内**に行われるものを受講しなければならない",
         trap:"試験合格の日から1年以内に交付を受けようとする者、登録移転の場合は受講する必要はない。\n宅建士の氏名について、旧姓使用を希望する者は、宅建士証に旧姓を併記できる（併記後であれば業務で旧姓を使用できる）。\n住所欄にシールを貼った上で提示することができる。" },
       { id:"g03-08", q:"7 宅建士証に伴う義務",
-        a:"提示：①重要事項の説明の際（違反すると10万円以下の過料）②取引の関係者から請求があったとき（罰則なし）\n提出・返納：事務禁止処分を受けたとき（10万円以下の過料）／①登録を削除されたとき②宅建証が効力を失ったとき（10万円以下の過料）\n書換え交付：氏名又は住所に変更があった場合（罰則なし）",
+        a:"|義務|事由|罰則\n|提示|① 重要事項の説明の際|10万円以下の過料\n|提示|② 取引の関係者から請求があったとき|罰則なし\n|提出・返納|事務禁止処分を受けたとき|10万円以下の過料\n|提出・返納|① 登録を削除されたとき ② 宅建士証が効力を失ったとき|10万円以下の過料\n|書換え交付|氏名又は住所に変更があった場合|罰則なし",
         trap:"お客から提示を求められたら提示しなければならない。\n重要事項説明のときは請求がなくても提示が必要。\n提出、返納ともに、宅建士証の交付を受けた知事に対してする。" }
     ]},
     { id:"ch04", title:"第4章 事務所の設置", items:[
@@ -1072,7 +1083,7 @@ function stats(items){
 function progHTML(items){
   const s = stats(items);
   const pct = s.total ? Math.round(s.o / s.total * 100) : 0;
-  return `<div class="prog"><span><b>○</b>${s.o}</span><span><b>△</b>${s.s}</span><span><b>×</b>${s.x}</span><span>未判定 ${s.n}</span></div>
+  return `<div class="prog"><span class="po"><b>○</b>${s.o}</span><span class="ps"><b>△</b>${s.s}</span><span class="px"><b>×</b>${s.x}</span><span>未判定 ${s.n}</span></div>
   <div class="bar" aria-label="○の割合 ${pct}%"><i style="width:${pct}%"></i></div>`;
 }
 
@@ -1129,12 +1140,13 @@ function detailHTML(it){
     <div class="a">${fmt(it.a)}</div>
     ${it.trap ? `<div class="trap"><b>ひっかけ注意</b>${fmt(it.trap)}</div>` : ""}
     <div class="rate" role="group" aria-label="自己判定">
-      ${["o","s","x"].map(k => `<button data-act="rate" data-id="${it.id}" data-k="${k}" class="${marks[it.id]===k?"sel":""}"><span>${SYM[k]}</span>${LABEL[k]}</button>`).join("")}
+      ${["o","s","x"].map(k => `<button data-act="rate" data-id="${it.id}" data-k="${k}" class="m-${k} ${marks[it.id]===k?"sel":""}"><span>${SYM[k]}</span>${LABEL[k]}</button>`).join("")}
     </div></div>`;
 }
 function stampHTML(id){
   const m = marks[id];
-  return `<span class="stamp ${m?"on":""} ${stampedId===id?"pop":""}" aria-label="${m?LABEL[m]:"未判定"}">${m?SYM[m]:""}</span>`;
+  const cls = m ? `on m-${m}` : "";
+  return `<span class="stamp ${cls} ${stampedId===id?"pop":""}" aria-label="${m?LABEL[m]:"未判定"}">${m?SYM[m]:""}</span>`;
 }
 function renderTheme(g, t){
   app.style.setProperty("--g", g.color);
@@ -1181,7 +1193,7 @@ function renderShuffle(){
   if (shuf.i >= shuf.list.length){
     const s = stats(shuf.list.map(x => x.it));
     app.innerHTML = head + `<div class="card"><div class="bigq">${shuf.list.length}問おわり</div>
-      <div class="prog"><span><b>○</b>${s.o}</span><span><b>△</b>${s.s}</span><span><b>×</b>${s.x}</span></div>
+      <div class="prog"><span class="po"><b>○</b>${s.o}</span><span class="ps"><b>△</b>${s.s}</span><span class="px"><b>×</b>${s.x}</span></div>
       <div class="btns"><button class="btn" data-act="again">もう一周</button><button class="btn ghost" data-act="nav" data-to="">ジャンルへ</button></div></div>`;
     return;
   }
